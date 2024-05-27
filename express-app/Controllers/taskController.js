@@ -34,11 +34,13 @@ export const createTask = async (req, res) => {
 
 //read function to read tasks
 export const readTask = async (req, res) => {
-    
+
 };
 
 //update function to update tasks
-export const updateTask = async (req, res) => {};
+export const updateTask = async (req, res) => {
+    
+};
 
 //delete function to delete tasks
 export const deleteTask = async (req, res) => {
