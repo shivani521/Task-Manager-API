@@ -32,14 +32,30 @@ export const createTask = async (req, res) => {
   }
 };
 
-//read function to read tasks
-export const readTask = async (req, res) => {
+//update function to read tasks
+export const readTask = async (req, res) => {};
 
-};
-
-//update function to update tasks
+//read function to update tasks
 export const updateTask = async (req, res) => {
-    
+  const { id } = req.params;
+  const updates = req.body;
+  console.log(updates);
+
+  try {
+    // Find the task by ID and update it with the new values
+    const task = await Task.findByIdAndUpdate(id, updates, { new: true });
+
+    if (!task) {
+      console.log("Task not found");
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    console.log("Task updated successfully");
+    res.status(200).json(task);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 //delete function to delete tasks
