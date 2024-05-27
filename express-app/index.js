@@ -2,8 +2,10 @@ import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
 import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
-import authRoutes from "./Routes/Login.js"; 
+import authRoutes from "./Routes/Login.js";
+import taskRoutes from "./Routes/manageTasks.js";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -15,6 +17,7 @@ app.use(cookieParser());
 
 // Routes
 app.use("/auth", authRoutes);
+app.use("/task", taskRoutes);
 
 // Get the MongoDB URI from environment variables
 const uri = process.env.MONGODB_URI;

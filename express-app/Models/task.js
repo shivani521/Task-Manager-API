@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import User from "./user.js";
 
 // Define the schema for tasks
 const taskSchema = new mongoose.Schema({
@@ -28,6 +29,6 @@ const taskSchema = new mongoose.Schema({
 });
 
 // Create a Task model using the schema
-const Task = mongoose.model('Task', taskSchema);
+const Task = mongoose.models.Task || mongoose.model('Task', taskSchema);
 
 export default Task;
