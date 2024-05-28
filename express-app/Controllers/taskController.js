@@ -3,25 +3,17 @@
 import Task from "../Models/task.js";
 import User from "../Models/user.js";
 
-//create function to create tasks
+// Create function to create tasks
 export const createTask = async (req, res) => {
-  const { title, description, dueDate, assignedTo } = req.body;
+  const { title, description, dueDate } = req.body;
+  const userId = req.user.userId; // Retrieve user ID from JWT token
 
   try {
-    const taskTitle = await Task.findOne({ title: title });
-    if (taskTitle) {
-      return res.status(404).json({ message: "task already created" });
-    }
-    const user = await User.findOne({ email: assignedTo });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
     const newTask = new Task({
       title,
       description,
       dueDate,
-      assignedTo: user._id,
+      assignedTo: userId, // Store user ID as the assignedTo field
     });
 
     await newTask.save();
@@ -32,10 +24,44 @@ export const createTask = async (req, res) => {
   }
 };
 
-//update function to read tasks
-export const readTask = async (req, res) => {};
+//function to read tasks
+export const readTask = async (req, res) => {
+  const { assignedTo, id, title, completed } = req.query;
 
-//read function to update tasks
+  try {
+    const searchCriteria = {};
+
+    if (id) {
+      searchCriteria._id = id;
+    }
+
+    if (title) {
+      searchCriteria.title = { $regex: title, $options: "i" }; // Case-insensitive regex search
+    }
+
+    if (assignedTo) {
+      searchCriteria.assignedTo = assignedTo;
+    }
+
+    if (completed !== undefined) {
+      searchCriteria.completed = completed === "true";
+    }
+
+    const tasks = await Task.find(searchCriteria);
+
+    if (tasks.length === 0) {
+      console.log("No tasks found");
+      return res.status(404).json({ message: "No tasks found" });
+    }
+
+    res.status(200).json(tasks);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+//function to update tasks
 export const updateTask = async (req, res) => {
   const { id } = req.params;
   const updates = req.body;

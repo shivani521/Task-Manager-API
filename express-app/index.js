@@ -15,6 +15,25 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// Middleware to authenticate and authorize user
+export const authenticateUser = (req, res, next) => {
+  // Check if user is authenticated (e.g., by verifying JWT token)
+  const token = req.cookies.token;
+  if (!token) {
+    return res.status(401).json({ message: "Access denied. Please log in." });
+  }
+
+  // Verify JWT token and extract user ID
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({ message: "Invalid token" });
+    }
+    req.user = user; // Set user object in request for future use
+    next(); // Proceed to the next middleware
+  });
+};
+
+
 // Routes
 app.use("/auth", authRoutes);
 app.use("/task", taskRoutes);
@@ -32,20 +51,9 @@ mongoose
     console.error("Error connecting to MongoDB", err);
   });
 
-// Middleware to authenticate token
-function authenticateToken(req, res, next) {
-  const token = req.cookies.token;
-  if (!token) return res.status(401).json({ message: "Access denied" });
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) return res.status(403).json({ message: "Invalid token" });
-    req.user = user;
-    next();
-  });
-}
 
 // Protected route
-app.get("/home", authenticateToken, (req, res) => {
+app.get("/home", authenticateUser, (req, res) => {
   res.send(`Welcome home, user ${req.user.userId}`);
 });
 
