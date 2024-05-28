@@ -36,7 +36,7 @@ export const authenticateUser = (req, res, next) => {
 
 // Routes
 app.use("/auth", authRoutes);
-app.use("/task", taskRoutes);
+app.use("/task", authenticateUser,taskRoutes);
 
 // Get the MongoDB URI from environment variables
 const uri = process.env.MONGODB_URI;
